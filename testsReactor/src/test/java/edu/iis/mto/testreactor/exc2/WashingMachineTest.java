@@ -1,20 +1,12 @@
 package edu.iis.mto.testreactor.exc2;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
 import org.junit.Test;
 
 public class WashingMachineTest {
-
-    @Before
-    public void itCompiles() {
-        assertThat(true, Matchers.equalTo(true));
-    }
 
     DirtDetector dirtDetector = mock(DirtDetector.class);
     Engine engine = mock(Engine.class);
@@ -42,9 +34,9 @@ public class WashingMachineTest {
                                    .withWeightKg(kilogramsOfLaundry)
                                    .build();
 
-        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
-
         when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
         assertEquals(laundryStatus.getResult(), Result.SUCCESS);
 
@@ -65,13 +57,12 @@ public class WashingMachineTest {
                                    .withWeightKg(kilogramsOfLaundry)
                                    .build();
 
-        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
-
         when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
         assertEquals(laundryStatus.getResult(), Result.FAILURE);
 
-        //
     }
 
     @Test
@@ -89,10 +80,9 @@ public class WashingMachineTest {
                                    .withWeightKg(kilogramsOfLaundry)
                                    .build();
 
-        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
-
         when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
-        // when(engine.spin()).
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
         assertEquals(laundryStatus.getRunnedProgram()
                                   .getTimeInMinutes(),
@@ -102,7 +92,7 @@ public class WashingMachineTest {
     }
 
     @Test
-    public void checkIfProgramIsTheSame() {
+    public void checkIfProgramsAreTheSame() {
         kilogramsOfLaundry = 5;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
@@ -116,11 +106,27 @@ public class WashingMachineTest {
                                    .withWeightKg(kilogramsOfLaundry)
                                    .build();
 
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
         laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
-        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
-        // when(engine.spin()).
-
         assertEquals(laundryStatus.getRunnedProgram(), programConfiguration.getProgram());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void checkIfProgramsTypeTheSame() {
+        kilogramsOfLaundry = 5;
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
+
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(false)
+                                                   .build();
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        // verify(dirtDetector.detectDirtDegree(laundryBatch), times(1));
     }
 }
