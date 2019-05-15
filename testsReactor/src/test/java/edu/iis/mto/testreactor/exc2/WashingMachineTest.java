@@ -23,22 +23,28 @@ public class WashingMachineTest {
     Percentage percentage = new Percentage(20);
     ProgramConfiguration programConfiguration;
     WashingMachine washingMachine;
+    int timeInMinutes = 20;
+    int kilogramsOfLaundry = 5;
 
     @Test
-    public void Test1() {
+    public void checkIfLaundryIsSuccess() {
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
         programConfiguration = ProgramConfiguration.builder()
                                                    .withProgram(Program.SHORT)
-                                                   .withSpin(false)
+                                                   .withSpin(true)
                                                    .build();
 
-        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
-        // when(engine.spin()).thenReturned(false);
-        // when(engine.runWashing(50)).thenReturned()
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
         laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
-        assertEquals(laundryStatus.getResult(), programConfiguration.getProgram());
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        assertEquals(laundryStatus.getResult(), Result.SUCCESS);
     }
 
 }
