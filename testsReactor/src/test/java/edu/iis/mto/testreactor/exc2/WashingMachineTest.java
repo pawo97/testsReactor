@@ -132,10 +132,31 @@ public class WashingMachineTest {
     }
 
     @Test
-    public void verifyLaunchLaundryOnce() {
+    public void verifyIfWaterPompLaunchOnce() {
         kilogramsOfLaundry = 5;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
-        Percentage percentageToTest = new Percentage(10);
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(false)
+                                                   .build();
+
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        verify(waterPump, times(1)).pour(kilogramsOfLaundry);
+
+    }
+
+    @Test
+    public void verifyIfEngineLaunchOnce() {
+        kilogramsOfLaundry = 5;
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
         programConfiguration = ProgramConfiguration.builder()
                                                    .withProgram(Program.SHORT)
                                                    .withSpin(false)
@@ -151,11 +172,7 @@ public class WashingMachineTest {
         laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
         // verify(dirtDetector, times(1)).detectDirtDegree(laundryBatch);
-        // verify(engine).runWashing(20);
+        verify(engine).runWashing(timeInMinutes);
 
-        verify(waterPump, times(1)).pour(kilogramsOfLaundry);
-        // .isGreaterThan(percentageToTest);
-
-        // System.out.println(laundryStatus.getRunnedProgram().);
     }
 }
