@@ -2,6 +2,8 @@ package edu.iis.mto.testreactor.exc2;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -21,7 +23,7 @@ public class WashingMachineTest {
 
     @Test
     public void checkIfLaundryIsSuccess() {
-        kilogramsOfLaundry = 5;
+        kilogramsOfLaundry = 3;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
         programConfiguration = ProgramConfiguration.builder()
@@ -93,7 +95,7 @@ public class WashingMachineTest {
 
     @Test
     public void checkIfProgramsAreTheSame() {
-        kilogramsOfLaundry = 5;
+        kilogramsOfLaundry = 4;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
         programConfiguration = ProgramConfiguration.builder()
@@ -114,7 +116,7 @@ public class WashingMachineTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void checkIfProgramsTypeTheSame() {
+    public void checkIfLaundryCantStart() {
         kilogramsOfLaundry = 5;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
@@ -127,6 +129,33 @@ public class WashingMachineTest {
 
         laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
 
-        // verify(dirtDetector.detectDirtDegree(laundryBatch), times(1));
+    }
+
+    @Test
+    public void verifyLaunchLaundryOnce() {
+        kilogramsOfLaundry = 5;
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
+        Percentage percentageToTest = new Percentage(10);
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(false)
+                                                   .build();
+
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        // verify(dirtDetector, times(1)).detectDirtDegree(laundryBatch);
+        // verify(engine).runWashing(20);
+
+        verify(waterPump, times(1)).pour(kilogramsOfLaundry);
+        // .isGreaterThan(percentageToTest);
+
+        // System.out.println(laundryStatus.getRunnedProgram().);
     }
 }
