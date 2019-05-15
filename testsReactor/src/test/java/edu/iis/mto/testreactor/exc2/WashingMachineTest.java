@@ -6,11 +6,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
 
 public class WashingMachineTest {
 
-    @Test
+    @Before
     public void itCompiles() {
         assertThat(true, Matchers.equalTo(true));
     }
@@ -24,10 +25,11 @@ public class WashingMachineTest {
     ProgramConfiguration programConfiguration;
     WashingMachine washingMachine;
     int timeInMinutes = 20;
-    int kilogramsOfLaundry = 5;
+    int kilogramsOfLaundry;
 
     @Test
     public void checkIfLaundryIsSuccess() {
+        kilogramsOfLaundry = 5;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
         programConfiguration = ProgramConfiguration.builder()
@@ -45,6 +47,29 @@ public class WashingMachineTest {
         when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
 
         assertEquals(laundryStatus.getResult(), Result.SUCCESS);
+    }
+
+    @Test
+    public void checkIfLaundryIsTooHeavy() {
+        kilogramsOfLaundry = 20;
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
+
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(true)
+                                                   .build();
+
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        assertEquals(laundryStatus.getResult(), Result.FAILURE);
+        // assertEquals(laundryStatus.getRunnedProgram(), programConfiguration);
     }
 
 }
