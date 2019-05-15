@@ -173,6 +173,28 @@ public class WashingMachineTest {
 
         // verify(dirtDetector, times(1)).detectDirtDegree(laundryBatch);
         verify(engine).runWashing(timeInMinutes);
+    }
 
+    @Test
+    public void verifyIfDirtDetectorLaunchOnce() {
+        kilogramsOfLaundry = 5;
+        Percentage percentage1 = new Percentage(20);
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(false)
+                                                   .build();
+
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        // verify(dirtDetector, times(1)).detectDirtDegree(laundryBatch);
+        // verify(engine).runWashing(timeInMinutes);
     }
 }
