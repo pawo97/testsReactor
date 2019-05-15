@@ -47,6 +47,7 @@ public class WashingMachineTest {
         when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
 
         assertEquals(laundryStatus.getResult(), Result.SUCCESS);
+
     }
 
     @Test
@@ -69,7 +70,35 @@ public class WashingMachineTest {
         when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
 
         assertEquals(laundryStatus.getResult(), Result.FAILURE);
-        // assertEquals(laundryStatus.getRunnedProgram(), programConfiguration);
+
+        //
+    }
+
+    @Test
+    public void checkIfProgramIsTheSame() {
+        kilogramsOfLaundry = 5;
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
+
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(false)
+                                                   .build();
+
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+        // when(engine.spin()).
+
+        assertEquals(laundryStatus.getRunnedProgram()
+                                  .getTimeInMinutes(),
+                programConfiguration.getProgram()
+                                    .getTimeInMinutes());
+
     }
 
 }
