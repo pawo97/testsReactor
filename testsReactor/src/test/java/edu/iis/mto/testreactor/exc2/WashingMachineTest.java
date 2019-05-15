@@ -75,7 +75,7 @@ public class WashingMachineTest {
     }
 
     @Test
-    public void checkIfProgramIsTheSame() {
+    public void checkIfProgramTimeIsTheSame() {
         kilogramsOfLaundry = 5;
         washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
 
@@ -101,4 +101,26 @@ public class WashingMachineTest {
 
     }
 
+    @Test
+    public void checkIfProgramIsTheSame() {
+        kilogramsOfLaundry = 5;
+        washingMachine = new WashingMachine(dirtDetector, engine, waterPump);
+
+        programConfiguration = ProgramConfiguration.builder()
+                                                   .withProgram(Program.SHORT)
+                                                   .withSpin(false)
+                                                   .build();
+
+        laundryBatch = LaundryBatch.builder()
+                                   .withType(Material.COTTON)
+                                   .withWeightKg(kilogramsOfLaundry)
+                                   .build();
+
+        laundryStatus = washingMachine.start(laundryBatch, programConfiguration);
+
+        when(dirtDetector.detectDirtDegree(laundryBatch)).thenReturn(percentage);
+        // when(engine.spin()).
+
+        assertEquals(laundryStatus.getRunnedProgram(), programConfiguration.getProgram());
+    }
 }
